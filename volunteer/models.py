@@ -30,7 +30,11 @@ class Event(Base):
     title = Column(Text)
     theme = Column(Text)
     message = Column(Text)
-    slots = relationship("Slot", backref="event")
+    #slots = relationship("Slot", backref="event")
+
+    def __init__(self,title,date):
+        self.title = title
+        self.date = date
 
 team_user_table = Table('team_user', Base.metadata,
     Column('user_id', Integer, ForeignKey('users.id')),
@@ -47,6 +51,10 @@ class Team(Base):
     members = relationship("User",
         secondary=team_user_table,
         backref="memberteams")
+#    slots = relationship("Slot", backref="team")
+
+    def __init__(self,name):
+        self.name = name
 
 
 class User(Base):
@@ -57,20 +65,35 @@ class User(Base):
     email = Column(Text, unique=True)
     phone = Column(Text)
 
+    slots = relationship("SlotUser", backref="user")
+
+    def __init__(self,name,email=None,phone=None):
+        self.name = name
+        self.email = email
+        self.phone = phone
+
 
 class SlotUser(Base):
     __tablename__ = 'slotuser'
     slot_id = Column(Integer, ForeignKey('slots.id'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    available = Column(Enum('Unknown','Available','NotAvailable'))
-    selected = Column(Enum('NotSelected','NotConfirmed','Confirmed'))
-    user = relationship("User", backref="slotusers")
+    available = Column(Enum('Unknown','Available','NotAvailable'), nullable=False)
+    selected = Column(Enum('NotSelected','NotConfirmed','Confirmed'), nullable=False)
+    slot = relationship("Slot", backref="slotusers")
 
 
 class Slot(Base):
     __tablename__ = 'slots'
     id = Column(Integer, primary_key=True)
     min_required = Column(Integer)
-    slotusers = relationship("SlotUser", backref="slot")
+#    slotusers = relationship("SlotUser", backref="slot")
     event_id = Column(Integer, ForeignKey('events.id'))
+    #slots = relationship("Slot", backref="event")
+    event = relationship("Event", backref="slots")
+    team_id = Column(Integer,ForeignKey('teams.id'))
+    team = relationship("Team", backref="slots")
 
+#    def __init__(self,team,event):
+#        self.team = team
+#        self.event = event
+#
