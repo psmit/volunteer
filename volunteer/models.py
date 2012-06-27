@@ -1,6 +1,7 @@
 from sqlalchemy import (
     Column,
     Integer,
+    String,
     Text,
     DateTime,
     ForeignKey,
@@ -92,6 +93,24 @@ class Slot(Base):
     event = relationship("Event", backref="slots")
     team_id = Column(Integer,ForeignKey('teams.id'))
     team = relationship("Team", backref="slots")
+
+class Sms(Base):
+    __tablename__ = 'sms'
+    id = Column(Integer,primary_key=True)
+    username = Column(String)
+    password = Column(String)
+    type = Column(Enum('text','binary'), nullable=False)
+    to = Column(String)
+    network_code = Column(String)
+    message_id = Column(String)
+    message_timestamp = Column(DateTime)
+    text = Column(Text)
+    concat = Column(String)
+    concat_ref = Column(String)
+    concat_total = Column(Integer)
+    concat_part = Column(Integer)
+
+
 
 #    def __init__(self,team,event):
 #        self.team = team
