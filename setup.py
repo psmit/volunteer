@@ -15,10 +15,11 @@ requires = [
     'zope.sqlalchemy',
     'waitress',
     'docutils',
+    'pyramid_simpleform'
     ]
 
 setup(name='volunteer',
-    version='0.0.1',
+    version='0.0.2',
     description='volunteer',
     long_description=README + '\n\n' +  CHANGES,
     classifiers=[
