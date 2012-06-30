@@ -50,7 +50,7 @@ def incoming_sms(request):
         DBSession.add(sms)
 
         from .libs import send_sms
-        send_sms(sms.msisdn,'This number is only used for sending messages, therefore your message could not be delivered.')
+        send_sms(sms.msisdn,'This number is only used for sending messages, therefore your message could not be delivered.',request.registry.settings)
 
         return {'project':'my project',
                 'form':'succes',
