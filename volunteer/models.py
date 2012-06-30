@@ -101,6 +101,7 @@ class Sms(Base):
     password = Column(String)
     type = Column(Enum('text','binary'), nullable=False)
     to = Column(String)
+    msisdn = Column(String)
     network_code = Column(String)
     message_id = Column(String)
     message_timestamp = Column(DateTime)

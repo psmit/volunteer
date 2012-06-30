@@ -1,3 +1,5 @@
+production.ini
+development.ini
 *.egg
 *.egg-info
 *.pyc
