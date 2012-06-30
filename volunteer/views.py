@@ -1,6 +1,8 @@
 from pyramid.view import view_config
 from deform import Form, ValidationFailure
 
+from .libs import send_sms
+
 from .models import (
     DBSession,
     Team,
@@ -10,6 +12,11 @@ from .models import (
 from .schemas import (
     SmsSchema,
 )
+
+def add_underscore_versions_of_keys(d):
+    for key in d.keys():
+        if '-' in key:
+            d[key.replace('-','_')] = d[key]
 
 @view_config(route_name='view_teams', renderer='teams.mako')
 def view_teams(request):
@@ -37,6 +44,7 @@ def incoming_sms(request):
     form = Form(schema, buttons=('submit',), method="GET")
     if 'messageId' in request.GET:
         try:
+            add_underscore_versions_of_keys(request.GET)
             appstruct = form.validate(request.GET.items())
         except ValidationFailure, e:
             return {'project':'my project',
@@ -49,7 +57,7 @@ def incoming_sms(request):
             setattr(sms, key, value)
         DBSession.add(sms)
 
-        from .libs import send_sms
+
         send_sms(sms.msisdn,'This number is only used for sending messages, therefore your message could not be delivered.',request.registry.settings)
 
         return {'project':'my project',
