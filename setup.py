@@ -15,7 +15,8 @@ requires = [
     'zope.sqlalchemy',
     'waitress',
     'docutils',
-    'pyramid_simpleform'
+    'pyramid_simpleform',
+    'deform',
     ]
 
 setup(name='volunteer',

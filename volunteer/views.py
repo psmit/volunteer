@@ -35,7 +35,7 @@ def record_to_appstruct(self):
 def incoming_sms(request):
     schema = SmsSchema()
     form = Form(schema, buttons=('submit',), method="GET")
-    if 'submit' in request.GET:
+    if 'messageId' in request.GET:
         try:
             appstruct = form.validate(request.GET.items())
         except ValidationFailure, e:
