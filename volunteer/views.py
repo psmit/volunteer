@@ -40,16 +40,25 @@ def incoming_sms(request):
             appstruct = form.validate(request.GET.items())
         except ValidationFailure, e:
             return {'project':'my project',
-                    'form':e.render()}
+                    'form':e.render(),
+                    'extra':'boo',
+                    }
 
         sms = Sms()
         for key,value in appstruct.items():
             setattr(sms, key, value)
         DBSession.add(sms)
 
+        from .libs import send_sms
+        send_sms(sms.msisdn,'This number is only used for sending messages, therefore your message could not be delivered.')
+
         return {'project':'my project',
-                'form':'succes'}
+                'form':'succes',
+                'extra':'boo',
+                }
 
     return {'project':'my project',
-            'form':form.render()}
+            'form':form.render(),
+            'extra':request.registry.settings['sms.key'],
+            }
 #    return {'project':'my project'}
