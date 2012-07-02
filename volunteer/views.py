@@ -24,6 +24,27 @@ def view_teams(request):
     return {'project':'my project',
             'teams':teams}
 
+@view_config(route_name='add_team_member',renderer='json')
+def add_team_member(request):
+    if 'team' in request.GET and 'user' in request.GET:
+        try:
+            team_id = int(request.GET['team'])
+            user_id = int(request.GET['user'])
+
+            team = DBSession.query(Team).get(team_id)
+            user = DBSession.query(User).get(user_id)
+            team.members.append(user)
+
+            return {'success': True,
+                    'user_name': user.name}
+
+        except ValueError:
+            return {'success': False,
+                    'error': 'Wrong arguments given'}
+
+    return {'success': False,
+            'error': 'Too little arguments given'}
+
 @view_config(route_name='get_possible_users', renderer='json')
 def get_possible_users(request):
     users = DBSession.query(User).all()

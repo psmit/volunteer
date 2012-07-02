@@ -13,6 +13,7 @@ def main(global_config, **settings):
 
 #    config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('view_teams', '/teams')
+    config.add_route('add_team_member', '/teams/add_member',xhr=True)
     config.add_route('get_possible_users', '/json/users')
     config.add_route('incoming_sms', '/sms')
     config.scan()
