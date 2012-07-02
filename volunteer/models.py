@@ -33,7 +33,7 @@ class Event(Base):
     message = Column(Text)
     #slots = relationship("Slot", backref="event")
 
-    def __init__(self,title,date):
+    def __init__(self,title=None,date=None):
         self.title = title
         self.date = date
 
@@ -54,7 +54,7 @@ class Team(Base):
         backref="memberteams")
 #    slots = relationship("Slot", backref="team")
 
-    def __init__(self,name):
+    def __init__(self,name=None):
         self.name = name
 
 
@@ -62,17 +62,20 @@ class User(Base):
     """ The SQLAlchemy declarative model class for a User object. """
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    name = Column(Text, unique=True)
-    email = Column(Text, unique=True)
-    phone = Column(Text)
+    name = Column(String, unique=True)
+    email = Column(String, unique=True)
+    phone = Column(String)
 
     slots = relationship("SlotUser", backref="user")
 
-    def __init__(self,name,email=None,phone=None):
+    def __init__(self,name=None,email=None,phone=None):
         self.name = name
         self.email = email
         self.phone = phone
 
+    def nice_phone(self):
+        if self.phone is not None:
+            return PhoneNumberFormatter().format(self.phone)
 
 class SlotUser(Base):
     __tablename__ = 'slotuser'
@@ -112,8 +115,38 @@ class Sms(Base):
     concat_part = Column(Integer)
 
 
+class PhoneNumberFormatter(object):
+    def __init__(self,default_prefix=358):
+        self.default_prefix = str(default_prefix)
 
-#    def __init__(self,team,event):
-#        self.team = team
-#        self.event = event
-#
+    def format(self,phone_number):
+        if phone_number.startswith(self.default_prefix):
+            phone_number = '0'+phone_number[len(self.default_prefix):]
+        else:
+            phone_number = '+'+phone_number
+
+        if len(phone_number) > 9:
+            for loc in [-7,-3]:
+                phone_number = phone_number[:loc] + " " + phone_number[loc:]
+
+        return phone_number
+
+    def normalize(self,phone_number):
+        phone_number = str(phone_number).strip()
+        phone_number = phone_number.translate(None,'-() ')
+        if len(phone_number) == 0:
+            return None
+
+        if phone_number.startswith('+'):
+            phone_number = phone_number[1:]
+        elif phone_number.startswith('00'):
+            phone_number = phone_number[2:]
+        elif phone_number.startswith('0'):
+            phone_number = self.default_prefix + phone_number[1:]
+        else:
+            raise ValueError("Phone number should start with + or 0")
+
+        if len(phone_number) < 10:
+            raise ValueError("Phone number too short")
+
+        return phone_number

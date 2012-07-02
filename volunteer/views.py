@@ -1,3 +1,4 @@
+from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 from deform import Form, ValidationFailure
 
@@ -11,7 +12,10 @@ from .models import (
 )
 from .schemas import (
     SmsSchema,
+    UserForm,
+    UserTeamForm,
 )
+from sqlalchemy.exc import IntegrityError
 
 def add_underscore_versions_of_keys(d):
     for key in d.keys():
@@ -21,8 +25,35 @@ def add_underscore_versions_of_keys(d):
 @view_config(route_name='view_teams', renderer='teams.mako')
 def view_teams(request):
     teams = DBSession.query(Team).all()
-    return {'project':'my project',
-            'teams':teams}
+    return {'teams':teams,
+            'form':UserTeamForm()}
+
+@view_config(route_name='edit_users', renderer='users.mako')
+@view_config(route_name='view_users', renderer='users.mako')
+def view_users(request):
+    try:
+        user = DBSession.query(User).get(int(request.matchdict['id']))
+        message = "Edit details for %s" % user.name
+    except (ValueError,KeyError,AttributeError):
+        user = User()
+        message = "Add new user"
+
+    form = UserForm(request.POST,user)
+    if request.method == 'POST' and form.validate():
+        form.populate_obj(user)
+        try:
+            DBSession.add(user)
+        except IntegrityError, e:
+
+            pass
+        #form = UserForm()
+        return HTTPFound('/users')
+
+    users = DBSession.query(User).all()
+    return {'form_title': message,
+            'users':users,
+            'form': form}
+
 
 @view_config(route_name='add_team_member',renderer='json')
 def add_team_member(request):
@@ -45,16 +76,16 @@ def add_team_member(request):
     return {'success': False,
             'error': 'Too little arguments given'}
 
+@view_config(route_name='get_possible_users_team',renderer='json')
 @view_config(route_name='get_possible_users', renderer='json')
 def get_possible_users(request):
-    users = DBSession.query(User).all()
-    users_json = []
-    for u in users:
-        users_json.append({
-            'id': u.id,
-            'name': u.name,
-        })
-    return users_json
+    query = DBSession.query(User)
+    try:
+        query = query.filter(~User.memberteams.any(Team.id == int(request.matchdict['team'])))
+    except (ValueError,KeyError):
+        pass
+
+    return [(user.id,user.name) for user in query.all()]
 
 def record_to_appstruct(self):
     return dict([(k, self.__dict__[k]) for k in sorted(self.__dict__) if '_sa_' != k[:4]])
