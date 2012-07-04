@@ -15,6 +15,8 @@ def main(global_config, **settings):
     config.add_route('view_teams', '/teams')
     config.add_route('view_users', '/users')
     config.add_route('edit_users', '/users/{id}')
+    config.add_route('view_events', '/events')
+    config.add_route('edit_events', '/events/{id}')
     config.add_route('add_team_member', '/teams/add_member',xhr=True)
     config.add_route('add_user', '/users/add', xhr=True)
     config.add_route('get_possible_users', '/json/users', xhr=True)

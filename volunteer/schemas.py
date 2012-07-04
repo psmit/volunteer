@@ -1,7 +1,7 @@
 from colander import MappingSchema, SchemaNode, String, Integer, DateTime
 from volunteer.models import PhoneNumberFormatter
 
-from wtforms import Form, TextField, validators, IntegerField, SelectField, HiddenField
+from wtforms import Form, TextField, validators, IntegerField, SelectField, HiddenField, DateTimeField
 from wtforms.fields import Field
 from wtforms.widgets import TextInput
 
@@ -47,6 +47,11 @@ class HiddenFlagField(HiddenField):
     def __init__(self,*args,**kwargs):
         super(HiddenFlagField, self).__init__(*args,**kwargs)
         self.flags.hidden = True
+
+class EventForm(Form):
+    date = DateTimeField('Date', [validators.Required()], format='%d.%m.%Y %H:%M')
+    title = TextField('Title', [validators.Optional()],filters=[empty_to_none])
+    theme = TextField('Theme', [validators.Optional()],filters=[empty_to_none])
 
 class UserForm(Form):
     name = TextField('Name', [validators.Length(min=4, max=60)])

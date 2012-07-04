@@ -30,7 +30,6 @@ class Event(Base):
     date = Column(DateTime)
     title = Column(Text)
     theme = Column(Text)
-    message = Column(Text)
     #slots = relationship("Slot", backref="event")
 
     def __init__(self,title=None,date=None):

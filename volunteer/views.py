@@ -9,11 +9,13 @@ from .models import (
     Team,
     User,
     Sms,
+    Event,
 )
 from .schemas import (
     SmsSchema,
     UserForm,
     UserTeamForm,
+    EventForm,
 )
 from sqlalchemy.exc import IntegrityError
 
@@ -53,6 +55,35 @@ def view_users(request):
     return {'form_title': message,
             'users':users,
             'form': form}
+
+
+@view_config(route_name='edit_events', renderer='events.mako')
+@view_config(route_name='view_events', renderer='events.mako')
+def view_events(request):
+    try:
+        event = DBSession.query(Event).get(int(request.matchdict['id']))
+        message = "Edit details for %s" % event.title
+    except (ValueError,KeyError,AttributeError):
+        event = Event()
+        message = "Add new event"
+
+    form = EventForm(request.POST,event)
+    if request.method == 'POST' and form.validate():
+        form.populate_obj(event)
+        try:
+            DBSession.add(event)
+        except IntegrityError, e:
+
+            pass
+            #form = UserForm()
+        return HTTPFound('/events')
+
+    events = DBSession.query(Event).all()
+    return {'form_title': message,
+            'events':events,
+            'form': form}
+
+
 
 
 @view_config(route_name='add_team_member',renderer='json')
