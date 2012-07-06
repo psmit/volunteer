@@ -16,6 +16,7 @@ requires = [
     'waitress',
     'docutils',
     'WTForms',
+    'alembic',
     ]
 
 setup(name='volunteer',

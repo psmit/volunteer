@@ -80,8 +80,8 @@ class SlotUser(Base):
     __tablename__ = 'slotuser'
     slot_id = Column(Integer, ForeignKey('slots.id'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    available = Column(Enum('Unknown','Available','NotAvailable'), nullable=False)
-    selected = Column(Enum('NotSelected','NotConfirmed','Confirmed'), nullable=False)
+    available = Column(Enum('Unknown','Available','NotAvailable',name="Availability"), nullable=False)
+    selected = Column(Enum('NotSelected','NotConfirmed','Confirmed',name="Confirmation"), nullable=False)
     slot = relationship("Slot", backref="slotusers")
 
 
@@ -101,7 +101,7 @@ class Sms(Base):
     id = Column(Integer,primary_key=True)
     username = Column(String)
     password = Column(String)
-    type = Column(Enum('text','binary'), nullable=False)
+    type = Column(Enum('text','binary',name="SMStype"), nullable=False)
     to = Column(String)
     msisdn = Column(String)
     network_code = Column(String)
