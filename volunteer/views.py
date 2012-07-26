@@ -2,7 +2,7 @@ from calendar import monthrange
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 from deform import Form, ValidationFailure
-from datetime import date
+from datetime import date, time, datetime, timedelta
 
 from .libs import send_sms
 
@@ -20,6 +20,7 @@ from .schemas import (
     UserForm,
     UserTeamForm,
     EventForm,
+    GenEventForm,
 )
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import and_
@@ -83,10 +84,34 @@ def view_events(request):
             #form = UserForm()
         return HTTPFound('/events')
 
+    gen_form = GenEventForm(request.POST)
+    if request.method == 'POST' and gen_form.validate():
+        test_date = gen_form.data['start_date']
+        try:
+            h,m = [int(a) for a in gen_form.data['gen_time'].split(':',1)]
+        except ValueError:
+            h,m = 10,0
+        the_time = time(h,m)
+        while test_date <= gen_form.data['end_date']:
+            if test_date.isoweekday() == gen_form.data['gen_day']:
+                event_date = datetime.combine(test_date,the_time)
+                other_events = DBSession.query(Event).filter(Event.date == event_date).all()
+                if len(other_events) == 0:
+
+                    new_event = Event()
+                    new_event.date = event_date
+                    new_event.title = event_date.strftime(gen_form.data['gen_title'])
+                    DBSession.add(new_event)
+
+            test_date = test_date + timedelta(days=1)
+
+        return HTTPFound('/events')
+
     events = DBSession.query(Event).all()
     return {'form_title': message,
             'events':events,
-            'form': form}
+            'form': form,
+            'gen_form': gen_form}
 
 @view_config(route_name='view_event', renderer='viewevent.mako')
 def view_event(request):

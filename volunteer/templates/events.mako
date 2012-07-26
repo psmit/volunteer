@@ -6,6 +6,9 @@
     <script>
         $(function() {
             $( "#date" ).datetimepicker({ dateFormat: "d.m.yy", timeFormat: "hh:mm" });
+            $( "#start_date").datepicker({ dateFormat: "d.m.yy" });
+            $( "#end_date").datepicker({ dateFormat: "d.m.yy" });
+            $( "#gen_time").timepicker({timeFormat: "hh:mm"})
         });
     </script>
 </%block>
@@ -25,3 +28,7 @@ ${forms.render_form(form)}
 
     </tbody>
 </table>
+
+
+<h3>Week generator</h3>
+${forms.render_form(gen_form)}
