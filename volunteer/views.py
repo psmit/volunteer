@@ -254,7 +254,7 @@ def get_possible_users_slotevent(request):
     slot = DBSession.query(Slot).get(int(request.matchdict['slot']))
     query = DBSession.query(User)
     try:
-        query = query.filter(~User.slots.any(Slot.id == int(request.matchdict['slot'])))
+        #query = query.filter(~User.slots.any(Slot.id == int(request.matchdict['slot'])))
         query = query.filter(User.memberteams.any(Team.id == slot.team_id))
     except (ValueError,KeyError):
         pass
