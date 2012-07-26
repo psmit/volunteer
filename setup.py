@@ -16,10 +16,11 @@ requires = [
     'waitress',
     'docutils',
     'WTForms',
+    'alembic',
     ]
 
 setup(name='volunteer',
-    version='0.0.4',
+    version='0.0.5',
     description='volunteer',
     long_description=README + '\n\n' +  CHANGES,
     classifiers=[
@@ -28,8 +29,8 @@ setup(name='volunteer',
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
-    author='',
-    author_email='',
+    author='Peter Smit',
+    author_email='peter@smitmail.eu',
     url='',
     keywords='',
     packages=find_packages(),
