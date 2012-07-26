@@ -17,10 +17,10 @@ ${forms.render_form(form)}
 
 
 <table style="border: 1px black solid;" id="table-events">
-    <thead><tr><th>Event</th><th>Date</th><th>Theme</th><th></th></tr></thead>
+    <thead><tr><th>Event</th><th>Date</th><th>Theme</th><th></th><th></th></tr></thead>
     <tbody>
             % for event in events:
-            <tr><td>${event.title}</td><td>${event.date}</td><td>${event.theme}</td><td><a href="/events/${event.id}">edit</a></td></tr>
+            <tr><td>${event.title}</td><td>${event.date}</td><td>${event.theme}</td><td><a href="/events/edit/${event.id}">edit</a></td><td><a href="/events/view/${event.id}">view</a></td></tr>
             % endfor
 
     </tbody>
