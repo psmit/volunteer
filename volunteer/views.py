@@ -285,7 +285,7 @@ def incoming_sms(request):
         DBSession.add(sms)
 
         if sms.text.strip().lower().startswith("test"):
-            send_sms(sms.msisdn,'This SMS should be send from "UCC". Let Peter know if it\'s not',request.registry.settings,from_name="UCC")
+            send_sms(sms.msisdn,'This SMS should be send from "UCC Sound". Let Peter know if it\'s not',request.registry.settings,from_name="UCC Sound")
             send_sms(sms.msisdn,'This SMS should be send from "+3584573950790". Let Peter know if it\'s not',request.registry.settings,from_name="3584573950790")
         else:
             send_sms(sms.msisdn,'This number is only used for sending messages, therefore your message could not be delivered.',request.registry.settings)

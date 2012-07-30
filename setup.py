@@ -43,6 +43,7 @@ setup(name='volunteer',
       main = volunteer:main
       [console_scripts]
       initialize_volunteer_db = volunteer.scripts.initializedb:main
+      send_notifications = volunteer.scripts.send_notifications:main
       """,
 )
 

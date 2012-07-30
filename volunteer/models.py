@@ -1,6 +1,7 @@
 from sqlalchemy import (
     Column,
     Integer,
+    Boolean,
     String,
     Text,
     DateTime,
@@ -82,6 +83,7 @@ class SlotUser(Base):
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     available = Column(Enum('Unknown','Available','NotAvailable',name="Availability"), nullable=False)
     selected = Column(Enum('NotSelected','NotConfirmed','Confirmed',name="Confirmation"), nullable=False)
+    notified = Column(Boolean,nullable=False,default=False)
     slot = relationship("Slot", backref="slotusers")
 
 
