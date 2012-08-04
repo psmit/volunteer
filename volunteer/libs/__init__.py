@@ -23,6 +23,7 @@ def send_sms(number,message,settings,prefix="sms.",from_name=None):
                                                     'from':from_name,
                                                     'to':number,
                                                     'text':message,
+                                                    'status-report-req': 1,
                                                     })))
 
     sms = None
