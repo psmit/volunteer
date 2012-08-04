@@ -17,6 +17,7 @@ requires = [
     'docutils',
     'WTForms',
     'alembic',
+    'boto',
     ]
 
 setup(name='volunteer',
@@ -44,6 +45,7 @@ setup(name='volunteer',
       [console_scripts]
       initialize_volunteer_db = volunteer.scripts.initializedb:main
       send_notifications = volunteer.scripts.send_notifications:main
+      send_test_sms = volunteer.scripts.send_test_sms:main
       """,
 )
 

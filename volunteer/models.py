@@ -85,6 +85,8 @@ class SlotUser(Base):
     selected = Column(Enum('NotSelected','NotConfirmed','Confirmed',name="Confirmation"), nullable=False)
     notified = Column(Boolean,nullable=False,default=False)
     slot = relationship("Slot", backref="slotusers")
+    notify_sms_id = Column(Integer,ForeignKey('smsmessage.id'))
+    notify_sms = relationship("SmsMessage")
 
 
 class Slot(Base):
@@ -151,3 +153,39 @@ class PhoneNumberFormatter(object):
             raise ValueError("Phone number too short")
 
         return phone_number
+
+class SmsDelivery(Base):
+    __tablename__ = "smsdelivery"
+    id = Column(Integer,primary_key=True)
+    to = Column(String)
+    network_code = Column(String)
+    message_id = Column(String)
+    msisdn = Column(String)
+    status = Column(String)
+    err_code = Column(String)
+    scts = Column(String)
+    message_timestamp = Column(String)
+
+class SmsMessage(Base):
+    __tablename__ = "smsmessage"
+    id = Column(Integer,primary_key=True)
+    from_name = Column(String)
+    to = Column(String)
+    text = Column(Text)
+    time = Column(DateTime)
+    num_message_parts = Column(Integer)
+
+class SmsMessagePart(Base):
+    __tablename__ = "smsmessagepart"
+    id = Column(Integer,primary_key=True)
+    part_id = Column(Integer)
+    sms_message_id = Column(Integer,ForeignKey('smsmessage.id'))
+    sms_message = relationship("SmsMessage", backref="message_parts")
+    to = Column(String)
+    status = Column(Integer)
+    message_id = Column(String)
+    remaining_balance = Column(Integer)
+    message_price = Column(Integer)
+    error_text = Column(String)
+
+

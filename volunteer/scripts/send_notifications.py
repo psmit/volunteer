@@ -41,7 +41,8 @@ def main(argv=sys.argv):
                 for slotuser in slot.slotusers:
                     user = slotuser.user
                     if user.phone is not None and not slotuser.notified:
-                        send_sms(user.phone,"Hey %s, just a reminder that you are on the roster for Sound in UCC Leppavaara tomorrow!" % user.name.split()[0],settings, from_name="UCC Sound")
+                        sms = send_sms(user.phone,"Hey %s, just a reminder that you are on the roster for Sound in UCC Leppavaara tomorrow 8.30!" % user.name.split()[0],settings, from_name="UCC Sound")
                         slotuser.notified = True
+                        slotuser.notify_sms = sms
 #                        DBSession.add(slotuser)
 
