@@ -30,6 +30,7 @@ def main(global_config, **settings):
     config.add_route('get_possible_users', '/json/users', xhr=True)
     config.add_route('get_possible_users_slotevent', '/json/users/slotevent/{slot}',xhr=True)
     config.add_route('get_possible_users_team','/json/users/team/{team}', xhr=True)
-    config.add_route('incoming_sms', '/sms')
+    config.add_route('incoming_sms', '/sms/incoming')
+    config.add_route('incoming_delivery', '/sms/delivery')
     config.scan()
     return config.make_wsgi_app()

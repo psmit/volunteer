@@ -14,9 +14,11 @@ from .models import (
     Event,
     Slot,
     SlotUser,
+    SmsDelivery,
 )
 from .schemas import (
     SmsSchema,
+    SmsDeliveryForm,
     UserForm,
     UserTeamForm,
     EventForm,
@@ -264,6 +266,17 @@ def get_possible_users_slotevent(request):
 
 def record_to_appstruct(self):
     return dict([(k, self.__dict__[k]) for k in sorted(self.__dict__) if '_sa_' != k[:4]])
+
+@view_config(route_name='incoming_delivery', renderer='json')
+def incoming_delivery(request):
+    form = SmsDeliveryForm(add_underscore_versions_of_keys(request.GET.items()))
+
+    if request.method == 'GET' and form.validate():
+        sd = SmsDelivery()
+        form.populate_obj(sd)
+        DBSession.add(sd)
+    return {}
+
 
 @view_config(route_name='incoming_sms',renderer='sms.mako')
 def incoming_sms(request):

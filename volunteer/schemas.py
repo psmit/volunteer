@@ -1,7 +1,7 @@
 from colander import MappingSchema, SchemaNode, String, Integer, DateTime
 from volunteer.models import PhoneNumberFormatter
 
-from wtforms import Form, TextField, validators, SelectField, HiddenField, DateTimeField, DateField
+from wtforms import Form, TextField, validators, SelectField, HiddenField, DateTimeField, DateField, IntegerField
 from wtforms.fields import Field
 from wtforms.widgets import TextInput
 
@@ -70,3 +70,14 @@ class GenEventForm(Form):
     gen_day = SelectField('Day of week', choices=[(7, 'Sunday'), (1, 'Monday'), (2, 'Tuesday'), (3,'Wednesday'),(4,'Thursday'),(5,'Friday'),(6,'Saturday')],coerce=int,default=7)
     gen_time = TextField('Time', [validators.Required()],default="10:00")
     gen_title = TextField('title string', [validators.Required()], default="%A %B %d %H:%M")
+
+
+class SmsDeliveryForm(Form):
+    to = TextField()
+    network_code = TextField()
+    message_id = TextField()
+    msisdn = TextField()
+    status = TextField()
+    err_code = IntegerField()
+    scts = DateTimeField(format="%y%m%d%H%M")
+    message_timestamp = DateTimeField(format="%Y-%m-%d %H:%M:%S")
