@@ -1,5 +1,6 @@
 # coding=utf-8
 from datetime import datetime, timedelta
+import logging
 import os
 import sys
 import transaction
@@ -33,6 +34,8 @@ def main(argv=sys.argv):
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
+
+    logger = logging.getLogger(__name__)
     with transaction.manager:
         events = DBSession.query(Event).filter(datetime.now() < Event.date).filter(Event.date < datetime.now() + timedelta(hours=17)).all()
 
@@ -42,6 +45,8 @@ def main(argv=sys.argv):
                     user = slotuser.user
                     if user.phone is not None and not slotuser.notified:
                         sms = send_sms(user.phone,"Hey %s, just a reminder that you are on the roster for Sound in UCC Leppavaara tomorrow 8.30!" % user.name.split()[0],settings, from_name="UCC Sound")
+                        logger.info("Send sms to %s" % user.name)
+                        print "Send sms to %s" % user.name
                         slotuser.notified = True
                         slotuser.notify_sms = sms
 #                        DBSession.add(slotuser)
