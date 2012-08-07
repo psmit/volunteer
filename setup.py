@@ -21,7 +21,7 @@ requires = [
     ]
 
 setup(name='volunteer',
-    version='0.0.5',
+    version='0.0.6',
     description='volunteer',
     long_description=README + '\n\n' +  CHANGES,
     classifiers=[
