@@ -15,7 +15,7 @@ from .models import (
     SlotUser,
     SmsDelivery,
 )
-from .schemas import (
+from .forms import (
     SmsDeliveryForm,
     UserForm,
     UserTeamForm,
