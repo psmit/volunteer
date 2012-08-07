@@ -1,25 +1,21 @@
-from colander import MappingSchema, SchemaNode, String, Integer, DateTime
 from volunteer.models import PhoneNumberFormatter
 
 from wtforms import Form, TextField, validators, SelectField, HiddenField, DateTimeField, DateField, IntegerField
 from wtforms.fields import Field
 from wtforms.widgets import TextInput
 
-class SmsSchema(MappingSchema):
-    username = SchemaNode(String(),missing=None)
-    password = SchemaNode(String(),missing=None)
-    type = SchemaNode(String(),missing=None)
-    to = SchemaNode(String(),missing=None)
-    msisdn = SchemaNode(String())
-    network_code = SchemaNode(String(),missing=None)
-    message_id = SchemaNode(String(),missing=None)
-    message_timestamp = SchemaNode(DateTime(),missing=None)
-    text = SchemaNode(String(),missing=None)
-    concat = SchemaNode(String(),missing=None)
-    concat_ref = SchemaNode(String(),missing=None)
-    concat_total = SchemaNode(Integer(),missing=None)
-    concat_part = SchemaNode(Integer(),missing=None)
-
+class SmsForm(Form):
+    type = TextField()
+    to = TextField()
+    msisdn = TextField()
+    network_code = TextField()
+    message_id = TextField()
+    message_timestamp = DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    text = TextField()
+    concat = TextField()
+    concat_ref = TextField()
+    concat_total = IntegerField()
+    concat_part = IntegerField()
 
 def empty_to_none(data):
     if data is None or len(data.strip()) == 0:

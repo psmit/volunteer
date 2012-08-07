@@ -1,7 +1,6 @@
 from calendar import monthrange
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
-from deform import Form, ValidationFailure
 from datetime import date, time, datetime, timedelta
 
 from .libs import send_sms
@@ -17,12 +16,12 @@ from .models import (
     SmsDelivery,
 )
 from .schemas import (
-    SmsSchema,
     SmsDeliveryForm,
     UserForm,
     UserTeamForm,
     EventForm,
     GenEventForm,
+    SmsForm,
 )
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import and_
@@ -279,23 +278,14 @@ def incoming_delivery(request):
     return {}
 
 
-@view_config(route_name='incoming_sms',renderer='sms.mako')
+@view_config(route_name='incoming_sms',renderer='json')
 def incoming_sms(request):
-    schema = SmsSchema()
-    form = Form(schema, buttons=('submit',), method="GET")
-    if 'messageId' in request.GET:
-        try:
-            add_underscore_versions_of_keys(request.GET)
-            appstruct = form.validate(request.GET.items())
-        except ValidationFailure, e:
-            return {'project':'my project',
-                    'form':e.render(),
-                    'extra':'boo',
-                    }
+    add_underscore_versions_of_keys(request.GET)
+    form = SmsForm(request.GET)
 
+    if request.method == 'GET' and form.validate():
         sms = Sms()
-        for key,value in appstruct.items():
-            setattr(sms, key, value)
+        form.populate_obj(sms)
         DBSession.add(sms)
 
         if sms.text.strip().lower().startswith("test"):
@@ -304,15 +294,5 @@ def incoming_sms(request):
         else:
             send_sms(sms.msisdn,'This number is only used for sending messages, therefore your message could not be delivered.',request.registry.settings)
 
-        return {'project':'my project',
-                'form':'succes',
-                'extra':'boo',
-                }
-
-    return {'project':'my project',
-            'form':form.render(),
-            'extra':request.registry.settings['sms.key'],
-            }
-#    return {'project':'my project'}
-
+    return {}
 
