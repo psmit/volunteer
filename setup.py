@@ -17,10 +17,11 @@ requires = [
     'docutils',
     'WTForms',
     'alembic',
+    'boto',
     ]
 
 setup(name='volunteer',
-    version='0.0.5',
+    version='0.0.6',
     description='volunteer',
     long_description=README + '\n\n' +  CHANGES,
     classifiers=[
@@ -43,6 +44,8 @@ setup(name='volunteer',
       main = volunteer:main
       [console_scripts]
       initialize_volunteer_db = volunteer.scripts.initializedb:main
+      send_notifications = volunteer.scripts.send_notifications:main
+      send_test_sms = volunteer.scripts.send_test_sms:main
       """,
 )
 

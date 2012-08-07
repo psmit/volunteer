@@ -1,7 +1,6 @@
 from calendar import monthrange
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
-from deform import Form, ValidationFailure
 from datetime import date, time, datetime, timedelta
 
 from .libs import send_sms
@@ -14,13 +13,15 @@ from .models import (
     Event,
     Slot,
     SlotUser,
+    SmsDelivery,
 )
-from .schemas import (
-    SmsSchema,
+from .forms import (
+    SmsDeliveryForm,
     UserForm,
     UserTeamForm,
     EventForm,
     GenEventForm,
+    SmsForm,
 )
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import and_
@@ -254,7 +255,7 @@ def get_possible_users_slotevent(request):
     slot = DBSession.query(Slot).get(int(request.matchdict['slot']))
     query = DBSession.query(User)
     try:
-        query = query.filter(~User.slots.any(Slot.id == int(request.matchdict['slot'])))
+        #query = query.filter(~User.slots.any(Slot.id == int(request.matchdict['slot'])))
         query = query.filter(User.memberteams.any(Team.id == slot.team_id))
     except (ValueError,KeyError):
         pass
@@ -265,38 +266,33 @@ def get_possible_users_slotevent(request):
 def record_to_appstruct(self):
     return dict([(k, self.__dict__[k]) for k in sorted(self.__dict__) if '_sa_' != k[:4]])
 
-@view_config(route_name='incoming_sms',renderer='sms.mako')
-def incoming_sms(request):
-    schema = SmsSchema()
-    form = Form(schema, buttons=('submit',), method="GET")
-    if 'messageId' in request.GET:
-        try:
-            add_underscore_versions_of_keys(request.GET)
-            appstruct = form.validate(request.GET.items())
-        except ValidationFailure, e:
-            return {'project':'my project',
-                    'form':e.render(),
-                    'extra':'boo',
-                    }
+@view_config(route_name='incoming_delivery', renderer='json')
+def incoming_delivery(request):
+    add_underscore_versions_of_keys(request.GET)
+    form = SmsDeliveryForm(request.GET)
 
+    if request.method == 'GET' and form.validate():
+        sd = SmsDelivery()
+        form.populate_obj(sd)
+        DBSession.add(sd)
+    return {}
+
+
+@view_config(route_name='incoming_sms',renderer='json')
+def incoming_sms(request):
+    add_underscore_versions_of_keys(request.GET)
+    form = SmsForm(request.GET)
+
+    if request.method == 'GET' and form.validate():
         sms = Sms()
-        for key,value in appstruct.items():
-            setattr(sms, key, value)
+        form.populate_obj(sms)
         DBSession.add(sms)
 
         if sms.text.strip().lower().startswith("test"):
-            send_sms(sms.msisdn,'This SMS should be send from "UCC". Let Peter know if it\'s not',request.registry.settings,from_name="UCC")
+            send_sms(sms.msisdn,'This SMS should be send from "UCC Sound". Let Peter know if it\'s not',request.registry.settings,from_name="UCC Sound")
             send_sms(sms.msisdn,'This SMS should be send from "+3584573950790". Let Peter know if it\'s not',request.registry.settings,from_name="3584573950790")
         else:
             send_sms(sms.msisdn,'This number is only used for sending messages, therefore your message could not be delivered.',request.registry.settings)
 
-        return {'project':'my project',
-                'form':'succes',
-                'extra':'boo',
-                }
+    return {}
 
-    return {'project':'my project',
-            'form':form.render(),
-            'extra':request.registry.settings['sms.key'],
-            }
-#    return {'project':'my project'}
