@@ -269,7 +269,8 @@ def record_to_appstruct(self):
 
 @view_config(route_name='incoming_delivery', renderer='json')
 def incoming_delivery(request):
-    form = SmsDeliveryForm(add_underscore_versions_of_keys(request.GET.items()))
+    add_underscore_versions_of_keys(request.GET)
+    form = SmsDeliveryForm(request.GET)
 
     if request.method == 'GET' and form.validate():
         sd = SmsDelivery()
