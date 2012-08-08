@@ -1,5 +1,6 @@
 from calendar import monthrange
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+from pyramid.settings import aslist
 from pyramid.view import view_config
 from datetime import date, time, datetime, timedelta
 
@@ -268,6 +269,8 @@ def record_to_appstruct(self):
 
 @view_config(route_name='incoming_delivery', renderer='json')
 def incoming_delivery(request):
+    if request.remote_addr not in aslist(request.registry.settings['sms.allowed_ips']):
+        return HTTPNotFound()
     add_underscore_versions_of_keys(request.GET)
     form = SmsDeliveryForm(request.GET)
 
@@ -280,6 +283,8 @@ def incoming_delivery(request):
 
 @view_config(route_name='incoming_sms',renderer='json')
 def incoming_sms(request):
+    if request.remote_addr not in aslist(request.registry.settings['sms.allowed_ips']):
+        return HTTPNotFound()
     add_underscore_versions_of_keys(request.GET)
     form = SmsForm(request.GET)
 
