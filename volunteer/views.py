@@ -1,7 +1,7 @@
 from calendar import monthrange
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.settings import aslist
-from pyramid.view import view_config
+from pyramid.view import view_config, view_defaults
 from datetime import date, time, datetime, timedelta
 
 from .libs import send_sms
@@ -240,28 +240,34 @@ def add_team_member(request):
     return {'success': False,
             'error': 'Too little arguments given'}
 
-@view_config(route_name='get_possible_users_team',renderer='json')
-@view_config(route_name='get_possible_users', renderer='json')
-def get_possible_users(request):
-    query = DBSession.query(User)
-    try:
-        query = query.filter(~User.memberteams.any(Team.id == int(request.matchdict['team'])))
-    except (ValueError,KeyError):
-        pass
+@view_defaults(route_name='get_possible_users', renderer='json')
+class UserCandidateFinder(object):
+    def __init__(self,request):
+        self.request = request
 
-    return [(user.id,user.name) for user in query.all()]
+    def _format(self,users):
+        return [(user.id,user.name) for user in users]
 
-@view_config(route_name='get_possible_users_slotevent', renderer='json')
-def get_possible_users_slotevent(request):
-    slot = DBSession.query(Slot).get(int(request.matchdict['slot']))
-    query = DBSession.query(User)
-    try:
-        #query = query.filter(~User.slots.any(Slot.id == int(request.matchdict['slot'])))
-        query = query.filter(User.memberteams.any(Team.id == slot.team_id))
-    except (ValueError,KeyError):
-        pass
+    @view_config(match_param='selection=slotevent')
+    def slotevent(self):
+        query = DBSession.query(User)
+        try:
+            slot = DBSession.query(Slot).get(int(self.request.matchdict['id']))
+            query = query.filter(User.memberteams.any(Team.id == slot.team_id))
+        except (ValueError,KeyError):
+            pass
 
-    return [(user.id,user.name) for user in query.all()]
+        return self._format(query.all())
+
+    @view_config(match_param='selection=team')
+    def team(self):
+        query = DBSession.query(User)
+        try:
+            query = query.filter(~User.memberteams.any(Team.id == int(self.request.matchdict['id'])))
+        except (ValueError,KeyError):
+            pass
+
+        return self._format(query.all())
 
 
 def record_to_appstruct(self):
