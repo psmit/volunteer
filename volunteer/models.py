@@ -157,6 +157,8 @@ class PhoneNumberFormatter(object):
 class SmsDelivery(Base):
     __tablename__ = "smsdelivery"
     id = Column(Integer,primary_key=True)
+    sms_message_part_id = Column(Integer, ForeignKey('smsmessagepart.id'))
+    sms_message_part = relationship("SmsMessagePart", backref="sms_deliveries")
     to = Column(String)
     network_code = Column(String)
     message_id = Column(String)

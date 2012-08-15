@@ -4,12 +4,16 @@ from pyramid.settings import aslist
 from pyramid.view import view_config, view_defaults
 from datetime import date, time, datetime, timedelta
 
-from .libs import send_sms
+from .libs import (
+    send_sms,
+    sms_saldo,
+)
 
 from .models import (
     DBSession,
     Team,
     User,
+    SmsMessage,
     Sms,
     Event,
     Slot,
@@ -31,6 +35,21 @@ def add_underscore_versions_of_keys(d):
     for key in d.keys():
         if '-' in key:
             d[key.replace('-','_')] = d[key]
+
+
+@view_config(route_name='index', renderer='index.mako')
+def index(request):
+
+    events = DBSession.query(Event).filter(
+        and_(Event.date >= datetime.now())).order_by(Event.date).limit(4).all()
+
+    smses = DBSession.query(SmsMessage).order_by(SmsMessage.id.desc()).limit(10).all()
+
+    return {'events': events,
+            'smses': smses,
+            'saldo': sms_saldo(request.registry.settings),
+            }
+
 
 @view_config(route_name='view_teams', renderer='teams.mako')
 def view_teams(request):

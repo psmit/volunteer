@@ -46,6 +46,7 @@ setup(name='volunteer',
       initialize_volunteer_db = volunteer.scripts.initializedb:main
       send_notifications = volunteer.scripts.send_notifications:main
       send_test_sms = volunteer.scripts.send_test_sms:main
+      fix_delivery_message_links = volunteer.scripts.fix_delivery_message_links:main
       """,
 )
 

@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
-from urllib import urlopen, urlencode
+from urllib2 import urlopen, Request
+from urllib import urlencode
 import boto
 
 from decimal import Decimal
@@ -10,6 +11,16 @@ from ..models import (
     SmsMessage,
     SmsMessagePart,
 )
+
+def sms_saldo(settings,prefix='sms.'):
+    base_url = "https://rest.nexmo.com/account/get-balance"
+    api_key = settings[prefix+"key"]
+    api_secret = settings[prefix+"secret"]
+
+    response = urlopen(Request("%s/%s/%s"%(base_url, api_key, api_secret), headers={"Accept" : "application/json"}))
+
+    return float(json.load(response)['value'])
+
 
 def send_sms(number,message,settings,prefix="sms.",from_name=None):
     base_url = "https://rest.nexmo.com/sms/json"
