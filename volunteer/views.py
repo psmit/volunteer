@@ -19,6 +19,7 @@ from .models import (
     Slot,
     SlotUser,
     SmsDelivery,
+    SmsMessagePart,
 )
 from .forms import (
     SmsDeliveryForm,
@@ -297,12 +298,17 @@ def incoming_delivery(request):
     if request.remote_addr not in aslist(request.registry.settings['sms.allowed_ips']):
         return HTTPNotFound()
     add_underscore_versions_of_keys(request.GET)
+    request.GET['message_id'] = request.GET['messageId']
     form = SmsDeliveryForm(request.GET)
 
     if request.method == 'GET' and form.validate():
         sd = SmsDelivery()
         form.populate_obj(sd)
         DBSession.add(sd)
+
+        message_part = DBSession.query(SmsMessagePart).filter(SmsMessagePart.message_id == sd.message_id).first()
+        if message_part is not None:
+            sd.sms_message_part = message_part
     return {}
 
 
